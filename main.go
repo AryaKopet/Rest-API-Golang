@@ -4,8 +4,28 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// Pembuatan struct menu item
+type MenuItem struct {
+	Name      string
+	OrderCode string
+	Price     int
+}
+
+// Pembuatan list menu item
 func getFoodMenu(c echo.Context) error {
-	return nil
+	foodMenu := []MenuItem{
+		{
+			Name:      "Bakmie",
+			OrderCode: "bakmie",
+			Price:     37500,
+		},
+		{
+			Name:      "Ayam Rica-Rica",
+			OrderCode: "ayam_rica_rica",
+			Price:     41250,
+		},
+	}
+	return (c.JSON(201, foodMenu)) // respon status code 201 Created Forma tJson
 }
 
 func main() {
