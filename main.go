@@ -1,6 +1,8 @@
 package main
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -25,7 +27,9 @@ func getFoodMenu(c echo.Context) error {
 			Price:     41250,
 		},
 	}
-	return (c.JSON(201, foodMenu)) // respon status code 201 Created Forma tJson
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		"data": foodMenu,
+	}) // respon status code 201 Created Forma tJson
 }
 
 func main() {
