@@ -1,12 +1,22 @@
 package main
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
+
+func main() {
+	seedDb() //pemanggilan database
+	e := echo.New()
+	// localhost:1404/menu/food
+	e.GET("/menu/foods", getFoodMenu)
+	e.GET("/menu/drinks", getDrinkMenu)
+	e.Logger.Fatal(e.Start(":14045"))
+}
 
 // Pembuatan struct menu item
 type MenuItem struct {
@@ -16,7 +26,7 @@ type MenuItem struct {
 }
 
 func seedDb() {
-	foodsMenu := []MenuItem{
+	foodMenu := []MenuItem{
 		{
 			Name:      "Bakmie",
 			OrderCode: "bakmie",
@@ -51,12 +61,16 @@ func seedDb() {
 		},
 	}
 
+	fmt.Println(foodMenu, drinksMenu)
+
 	dbAdress := "host=localhost port=5432 user=postgres password=Arya2003ok dbname=go_resto_app sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dbAdress))
 	if err != nil {
 		panic(err)
 	}
-	db.AutoMigrate(&MenuItem{})
+	// db.AutoMigrate(&MenuItem{}) // membuat migrasi otomatis kedalam database
+	db.Create(foodMenu)   // menambahkan data makanan ke dalam database
+	db.Create(drinksMenu) // //menambahkan data minuman ke dalam database
 
 }
 
@@ -70,15 +84,6 @@ func getFoodMenu(c echo.Context) error {
 // List menu minuman
 func getDrinkMenu(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		// "data": foodMenu,
+		// "data": drinksMenu,
 	}) // respon status code 201 Created Forma tJson
-}
-
-func main() {
-	seedDb() //pemanggilan database
-	e := echo.New()
-	// localhost:1404/menu/food
-	e.GET("/menu/foods", getFoodMenu)
-	e.GET("/menu/drinks", getDrinkMenu)
-	e.Logger.Fatal(e.Start(":14045"))
 }
