@@ -17,8 +17,7 @@ func main() {
 	seedDb() //pemanggilan database
 	e := echo.New()
 	// localhost:1404/menu/food
-	e.GET("/menu/foods", getFoodMenu)
-	e.GET("/menu/drinks", getDrinkMenu)
+	e.GET("/menu", getMenu)
 	e.Logger.Fatal(e.Start(":14045"))
 }
 
@@ -26,7 +25,7 @@ type MenuType string
 
 const (
 	MenuTypeFood   = "Food"
-	MenuTypeDrinks = "Drinks"
+	MenuTypeDrinks = "Drink"
 )
 
 // Pembuatan struct menu item
@@ -43,16 +42,19 @@ func seedDb() {
 			Name:      "Bakmie",
 			OrderCode: "bakmie",
 			Price:     37500,
+			Type:      MenuTypeFood,
 		},
 		{
 			Name:      "Ayam Rica-Rica",
 			OrderCode: "ayam_rica_rica",
 			Price:     41250,
+			Type:      MenuTypeFood,
 		},
 		{
 			Name:      "Lalapan",
 			OrderCode: "lalapan",
 			Price:     38000,
+			Type:      MenuTypeFood,
 		},
 	}
 	drinksMenu := []MenuItem{
@@ -60,16 +62,19 @@ func seedDb() {
 			Name:      "Josu",
 			OrderCode: "josu",
 			Price:     10000,
+			Type:      MenuTypeDrinks,
 		},
 		{
 			Name:      "Es Teh",
 			OrderCode: "es_teh",
 			Price:     5000,
+			Type:      MenuTypeDrinks,
 		},
 		{
 			Name:      "Es Jeruk",
 			OrderCode: "es_jeruk",
 			Price:     7000,
+			Type:      MenuTypeDrinks,
 		},
 	}
 
@@ -80,28 +85,26 @@ func seedDb() {
 	}
 
 	if err := db.First(&MenuItem{}).Error; err == gorm.ErrRecordNotFound { //pengecekan database pertama kali
-		// db.AutoMigrate(&MenuItem{}) // membuat migrasi otomatis kedalam database
-		db.Create(foodMenu)   // menambahkan data makanan ke dalam database
-		db.Create(drinksMenu) // //menambahkan data minuman ke dalam database
+		db.AutoMigrate(&MenuItem{}) // membuat migrasi otomatis kedalam database
+		db.Create(foodMenu)         // menambahkan data makanan ke dalam database
+		db.Create(drinksMenu)       // //menambahkan data minuman ke dalam database
 	}
 
 }
 
-// List menu makanan
-func getFoodMenu(c echo.Context) error {
+func getMenu(c echo.Context) error {
+	menuType := c.FormValue("menu_type")
+
 	db, err := gorm.Open(postgres.Open(dbAdress))
 	if err != nil {
 		panic(err)
 	}
 
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": foodMenu,
-	}) // respon status code 201 Created Forma tJson
-}
+	var menuData []MenuItem
+	db.Where(MenuItem{Type: MenuType(menuType)}).Find(&menuData)
 
-// List menu minuman
-func getDrinkMenu(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": drinksMenu,
-	}) // respon status code 201 Created Forma tJson
+		"data": menuData,
+	})
+
 }
