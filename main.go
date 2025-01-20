@@ -9,6 +9,10 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	dbAdress = "host=localhost port=5432 user=postgres password=Arya2003ok dbname=go_resto_app sslmode=disable"
+)
+
 func main() {
 	seedDb() //pemanggilan database
 	e := echo.New()
@@ -18,11 +22,19 @@ func main() {
 	e.Logger.Fatal(e.Start(":14045"))
 }
 
+type MenuType string
+
+const (
+	MenuTypeFood   = "Food"
+	MenuTypeDrinks = "Drinks"
+)
+
 // Pembuatan struct menu item
 type MenuItem struct {
 	Name      string
 	OrderCode string
 	Price     int
+	Type      MenuType
 }
 
 func seedDb() {
@@ -62,28 +74,34 @@ func seedDb() {
 	}
 
 	fmt.Println(foodMenu, drinksMenu)
-
-	dbAdress := "host=localhost port=5432 user=postgres password=Arya2003ok dbname=go_resto_app sslmode=disable"
 	db, err := gorm.Open(postgres.Open(dbAdress))
 	if err != nil {
 		panic(err)
 	}
-	// db.AutoMigrate(&MenuItem{}) // membuat migrasi otomatis kedalam database
-	db.Create(foodMenu)   // menambahkan data makanan ke dalam database
-	db.Create(drinksMenu) // //menambahkan data minuman ke dalam database
+
+	if err := db.First(&MenuItem{}).Error; err == gorm.ErrRecordNotFound { //pengecekan database pertama kali
+		// db.AutoMigrate(&MenuItem{}) // membuat migrasi otomatis kedalam database
+		db.Create(foodMenu)   // menambahkan data makanan ke dalam database
+		db.Create(drinksMenu) // //menambahkan data minuman ke dalam database
+	}
 
 }
 
 // List menu makanan
 func getFoodMenu(c echo.Context) error {
+	db, err := gorm.Open(postgres.Open(dbAdress))
+	if err != nil {
+		panic(err)
+	}
+
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		// "data": foodMenu,
+		"data": foodMenu,
 	}) // respon status code 201 Created Forma tJson
 }
 
 // List menu minuman
 func getDrinkMenu(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		// "data": drinksMenu,
+		"data": drinksMenu,
 	}) // respon status code 201 Created Forma tJson
 }
