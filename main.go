@@ -56,6 +56,7 @@ func seedDb() {
 	if err != nil {
 		panic(err)
 	}
+	db.AutoMigrate(&MenuItem{})
 
 }
 
@@ -74,6 +75,7 @@ func getDrinkMenu(c echo.Context) error {
 }
 
 func main() {
+	seedDb() //pemanggilan database
 	e := echo.New()
 	// localhost:1404/menu/food
 	e.GET("/menu/foods", getFoodMenu)
