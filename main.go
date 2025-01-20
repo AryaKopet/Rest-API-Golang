@@ -4,6 +4,8 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 )
 
 // Pembuatan struct menu item
@@ -13,9 +15,8 @@ type MenuItem struct {
 	Price     int
 }
 
-// List menu makanan
-func getFoodMenu(c echo.Context) error {
-	foodMenu := []MenuItem{
+func seedDb() {
+	foodsMenu := []MenuItem{
 		{
 			Name:      "Bakmie",
 			OrderCode: "bakmie",
@@ -32,14 +33,7 @@ func getFoodMenu(c echo.Context) error {
 			Price:     38000,
 		},
 	}
-	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": foodMenu,
-	}) // respon status code 201 Created Forma tJson
-}
-
-// List menu minuman
-func getDrinkMenu(c echo.Context) error {
-	foodMenu := []MenuItem{
+	drinksMenu := []MenuItem{
 		{
 			Name:      "Josu",
 			OrderCode: "josu",
@@ -56,8 +50,26 @@ func getDrinkMenu(c echo.Context) error {
 			Price:     7000,
 		},
 	}
+
+	dbAdress := "host=localhost port=5432 user=postgres password=Arya2003ok dbname=go_resto_app sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dbAdress))
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+// List menu makanan
+func getFoodMenu(c echo.Context) error {
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"data": foodMenu,
+		// "data": foodMenu,
+	}) // respon status code 201 Created Forma tJson
+}
+
+// List menu minuman
+func getDrinkMenu(c echo.Context) error {
+	return c.JSON(http.StatusOK, map[string]interface{}{
+		// "data": foodMenu,
 	}) // respon status code 201 Created Forma tJson
 }
 
