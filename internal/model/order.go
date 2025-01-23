@@ -7,11 +7,11 @@ type Order struct {
 	ProductOreders []ProductOreder
 }
 
-type ProductOrederStatus string
+type ProductOrderStatus string
 
 type ProductOreder struct {
 	OrderCode  string
 	Quantity   int
 	TotalPrice int64
-	Status     ProductOrederStatus
+	Status     ProductOrderStatus
 }
